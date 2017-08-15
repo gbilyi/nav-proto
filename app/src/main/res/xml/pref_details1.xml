@@ -1,0 +1,20 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="pref_screen"
+    android:title="@string/bla" >
+
+    <PreferenceCategory
+        android:key="pref_cat_show_navigator_notification"
+        android:title="@string/bla">
+        <Preference
+            android:key="pref_1"
+            android:title="Pref 1" />
+        <Preference
+            android:key="pref_2"
+            android:title="Pref 2" />
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>
+

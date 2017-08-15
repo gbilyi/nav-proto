@@ -1,0 +1,13 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="pref_screen"
+    android:title="Bla" >
+
+    <Preference
+        android:key="pref_0"
+        android:title="Bla Yo" />
+
+
+
+</PreferenceScreen>
+

@@ -3,8 +3,8 @@ package gordbilyi.com.navigator.settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
-import gordbilyi.com.navigator.settings.details.SettingsDetailsTwo;
 import gordbilyi.com.navigator.settings.details.SettingsDetailsOne;
+import gordbilyi.com.navigator.settings.details.SettingsDetailsTwo;
 
 /**
  * Created by gordbilyi on 15/08/17.
@@ -12,10 +12,12 @@ import gordbilyi.com.navigator.settings.details.SettingsDetailsOne;
 
 public class SettingsNavigator implements SettingsContract.Navigator {
 
+    private Fragment mFragment;
     private final FragmentManager mFragmentManager;
 
-    public SettingsNavigator(Fragment mFragment) {
-        this.mFragmentManager = mFragment.getChildFragmentManager();
+    public SettingsNavigator(Fragment fragment) {
+        mFragment = fragment;
+        mFragmentManager = fragment.getChildFragmentManager();
     }
 
     public void openDetailsOne() {
@@ -30,6 +32,12 @@ public class SettingsNavigator implements SettingsContract.Navigator {
 
     @Override
     public boolean popSubFragment() {
+
+        // allow upper navigation but do not pop the fragment if it's invisible
+        if (!mFragment.getUserVisibleHint()) {
+            return false;
+        }
+
         if (mFragmentManager.getBackStackEntryCount() > 0) {
             mFragmentManager.popBackStack();
             return true;

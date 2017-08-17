@@ -12,10 +12,12 @@ import gordbilyi.com.navigator.R;
 
 public class SharingNavigator implements SharingContract.Navigator {
 
+    private Fragment mFragment;
     private final FragmentManager mFragmentManager;
 
-    public SharingNavigator(Fragment mFragment) {
-        this.mFragmentManager = mFragment.getChildFragmentManager();
+    public SharingNavigator(Fragment fragment) {
+        mFragment = fragment;
+        mFragmentManager = fragment.getChildFragmentManager();
     }
 
     @Override
@@ -32,6 +34,12 @@ public class SharingNavigator implements SharingContract.Navigator {
 
     @Override
     public boolean popSubFragment() {
+
+        // allow upper navigation but do not pop the fragment if it's invisible
+        if (!mFragment.getUserVisibleHint()) {
+            return false;
+        }
+
         if (mFragmentManager.getBackStackEntryCount() > 0) {
             mFragmentManager.popBackStack();
             return true;

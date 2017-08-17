@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.Navi
 
         mPresenter = new MainPresenter();
         mNavigator = new MainNavigator(mViewPager, mNavigation, this);
-        mPresenter.setNavigator(mNavigator);
-
     }
 
     @Override
@@ -48,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.Navi
     @Override
     protected void onStart() {
         super.onStart();
+        mPresenter.setNavigator(mNavigator);
         mPresenter.onAttachView(this);
     }
 

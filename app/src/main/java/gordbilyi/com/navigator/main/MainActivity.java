@@ -14,47 +14,55 @@ import gordbilyi.com.navigator.R;
 import gordbilyi.com.navigator.settings.SettingsFragment;
 import gordbilyi.com.navigator.sharing.SharingFragment;
 import gordbilyi.com.navigator.spaces.SpacesFragment;
+import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements MainContract.NavigatorProvider {
+public class MainActivity extends AppCompatActivity implements MainContract.NavigatorProvider, MainContract.View {
 
     private BottomNavigationView mNavigation;
     private ViewPager mViewPager;
     private MainContract.Navigator mNavigator;
+    private MainContract.Presenter mPresenter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        Timber.plant(new Timber.DebugTree());
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        initViewPager();
+        initNavigation();
+
+        mPresenter = new MainPresenter();
+        mNavigator = new MainNavigator(mViewPager, mNavigation, this);
+        mPresenter.setNavigator(mNavigator);
+
+    }
 
     @Override
     public MainContract.Navigator getNavigator() {
-        if (mNavigator == null) {
-            mNavigator = new MainNavigator(mViewPager, mNavigation, this);
-        }
+        // maybe redundant
         return mNavigator;
     }
 
     @Override
-    public void onBackPressed() {
-        if (!getNavigator().selectPreviousTab()) {
-            super.onBackPressed();
-        }
+    protected void onStart() {
+        super.onStart();
+        mPresenter.onAttachView(this);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void onStop() {
+        super.onStop();
+        mPresenter.onDetachView();
+    }
 
-        initViewPager();
 
-        mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
-        mNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                getNavigator().selectTabById(item.getItemId());
-                return true;
-            }
-
-        });
-
-        getNavigator().selectSpacesTab();
+    @Override
+    public void onBackPressed() {
+        if (!mPresenter.selectPreviousTab()) {
+            super.onBackPressed();
+        }
     }
 
     private void initViewPager() {
@@ -68,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.Navi
 
             @Override
             public void onPageSelected(int position) {
-                getNavigator().selectTabByIndex(position);
+                mPresenter.selectTabByIndex(position);
             }
 
             @Override
@@ -99,8 +107,26 @@ public class MainActivity extends AppCompatActivity implements MainContract.Navi
         });
     }
 
-    public void onClick(View view) {
-        getNavigator().selectSettingsTab();
+    private void initNavigation() {
+        mNavigation = (BottomNavigationView) findViewById(R.id.navigation);
+        mNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                mPresenter.selectTabById(item.getItemId());
+                return true;
+            }
+
+        });
     }
 
+    public void onClick(View view) {
+        mPresenter.selectSettingsTab();
+    }
+
+
+    @Override
+    public void start() {
+        mPresenter.selectSpacesTab();
+    }
 }

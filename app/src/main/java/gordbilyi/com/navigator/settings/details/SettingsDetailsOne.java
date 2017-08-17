@@ -12,10 +12,17 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import gordbilyi.com.navigator.R;
-import gordbilyi.com.navigator.settings.SettingsContract;
 
 
 public class SettingsDetailsOne extends PreferenceFragmentCompat {
+
+    public static final String PREF_KEY_DETAILS = "pref_0";
+    FragmentInteractionListener mCallback;
+
+    // Container Activity must implement this interface
+    public interface FragmentInteractionListener {
+        void onPreferenceSelected(String prefKey);
+    }
 
 
     public SettingsDetailsOne() {
@@ -24,14 +31,24 @@ public class SettingsDetailsOne extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
         setPreferencesFromResource(R.xml.pref_details2, rootKey);
-        findPreference("pref_0").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        findPreference(PREF_KEY_DETAILS).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                getNavigator().openDetailsTwo();
+                mCallback.onPreferenceSelected(PREF_KEY_DETAILS);
                 return true;
             }
         });
+
+        // This makes sure that the container context has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (FragmentInteractionListener) getParentFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getParentFragment().toString()
+                    + " must implement FragmentInteractionListener");
+        }
 
     }
 
@@ -47,13 +64,5 @@ public class SettingsDetailsOne extends PreferenceFragmentCompat {
         return view;
     }
 
-
-    SettingsContract.Navigator getNavigator() {
-        Fragment parentFragment = getParentFragment();
-        if (parentFragment instanceof SettingsContract.NavigatorProvider) {
-            return ((SettingsContract.NavigatorProvider) parentFragment).getNavigator();
-        }
-        throw new IllegalStateException("Must implement SettingsContract.NavigatorProvider");
-    }
 
 }
